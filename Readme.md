@@ -1,7 +1,6 @@
 ## Описание
 
-Эта модель предсказывает пунктуацию текстов на английском, итальянском, французском и немецком языках.
-Она разработана для восстановления пунктуации расшифрованного разговорного языка.
+Эта модель разработана для заполнения масок(предложений с пропущенным словом) на английском и французском языка.
 
 ## Начало работы
 
@@ -12,11 +11,11 @@ pip install -r requirements.txt
 
 Запуск программы:
 ```
-streamlit run src/main.py
+streamlit run main.py
 ```
 
 ## Материалы
 
 Streamlit: streamlit.io
 
-Модель: huggingface.co/oliverguhr/fullstop-punctuation-multilang-large
+Модель: huggingface.co/camembert-base
