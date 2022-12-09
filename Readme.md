@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 Запуск программы:
 ```
-streamlit run src/main.py
+streamlit run main.py
 ```
 
 ## Материалы
