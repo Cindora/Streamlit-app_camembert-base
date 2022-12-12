@@ -9,29 +9,37 @@ def get_text():
     )
 
 
+@st.cache
+def unmask(text):
+    split_text = text.split("*?")
+    result_text = split_text[0]
+    results = [""]
+    for i in range(1, len(split_text)):
+        unmasker = pipeline('fill-mask', model='camembert-base')
+        tmp_result = unmasker(result_text + "<mask>" + split_text[i])
+
+        result_text += tmp_result[0]["token_str"] + split_text[i]
+
+        results.append("")
+        for el in tmp_result:
+            results[i] += (el["token_str"] + " - " + str(round(el["score"] * 100)) + "%  |  ")
+
+    results[0]=result_text
+    return results
+
+
 def main():
     st.title("")
-    
     text = get_text()
-    
-    unmasker = pipeline('fill-mask', model='camembert-base')
-    
-    result = split_text[0]
-    
+
     if text != "":
-        split_text = text.split("*?")
-        
-        for i in range(1, len(split_text)):
-            tmp_result = unmasker(result + "<mask>" + split_text[i])
+        results = unmask(text)
+        st.caption("\nВарианты слов и их вероятностное распределение:")
+        for i in range(1, len(results)):
+            st.write(str(i) + ": " + results[i])
 
-            result += tmp_result[0]["token_str"] + split_text[i]
-
-            st.caption("\nВарианты слов и их вероятностное распределение:")
-            for el in tmp_result:
-                st.write(el["token_str"] + " - " + str(round(el["score"] * 100)) + "%")
-
-        st.caption("\nВозможный финальный вид текста:")
-        st.write(result)
+        st.caption("Возможный финальный вид текста:")
+        st.write(results[0])
 
 
 if __name__ == "__main__":
