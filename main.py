@@ -4,21 +4,34 @@ import streamlit as st
 
 def get_text():
     return st.text_area(
-        label="Введите предложение на английском или французском языках(желаемое для подбора слово замените на <mask>):",
-        value="My name is Boris and i'm from <mask>."
+        label="Введите предложение на английском или французском языках(желаемое для подбора слово замените на *? ):",
+        value="Replace me by *? you'd like. I love *? and my mother, but *? only one who *? me."
     )
 
 
 def main():
     st.title("")
+    
     text = get_text()
-    camembert_fill_mask = pipeline("fill-mask", model="camembert-base", tokenizer="camembert-base")
-
+    
+    unmasker = pipeline('fill-mask', model='camembert-base')
+    
+    result = split_text[0]
+    
     if text != "":
-        results = camembert_fill_mask(text)
-        st.caption("Варианты слов и их вероятностное распределение:")
-        for el in results:
-            st.write(el["token_str"] + " - " + str(round(el["score"] * 100)) + "%")
+        split_text = text.split("*?")
+        
+        for i in range(1, len(split_text)):
+            tmp_result = unmasker(result + "<mask>" + split_text[i])
+
+            result += tmp_result[0]["token_str"] + split_text[i]
+
+            st.caption("\nВарианты слов и их вероятностное распределение:")
+            for el in tmp_result:
+                st.write(el["token_str"] + " - " + str(round(el["score"] * 100)) + "%")
+
+        st.caption("\nВозможный финальный вид текста:")
+        st.write(result)
 
 
 if __name__ == "__main__":
