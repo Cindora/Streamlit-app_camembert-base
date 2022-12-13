@@ -4,8 +4,8 @@ import streamlit as st
 
 def get_text():
     return st.text_area(
-        label="Введите предложение на английском или французском языках(желаемое для подбора слово замените на *? ):",
-        value="Replace me by *? you'd like. I love *? and my mother, but *? only one who *? me."
+        label="Введите текст-маску на английском или французском языках (желаемые для подбора слова замените на *? ):",
+        value="Diplomacy is the *? of telling *? to go to *? in such a way that they *?."
     )
 
 
@@ -32,7 +32,7 @@ def main():
     st.title("")
     text = get_text()
 
-    if text != "":
+    if bool(st.button('Fill')) & (text != ""):
         results = unmask(text)
         st.caption("\nВарианты слов и их вероятностное распределение:")
         for i in range(1, len(results)):
