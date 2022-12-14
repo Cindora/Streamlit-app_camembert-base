@@ -14,8 +14,9 @@ def unmask(text):
     split_text = text.split("*?")
     result_text = split_text[0]
     results = [""]
+    unmasker = pipeline('fill-mask', model='camembert-base')
+    
     for i in range(1, len(split_text)):
-        unmasker = pipeline('fill-mask', model='camembert-base')
         tmp_result = unmasker(result_text + "<mask>" + split_text[i])
 
         result_text += tmp_result[0]["token_str"] + split_text[i]
