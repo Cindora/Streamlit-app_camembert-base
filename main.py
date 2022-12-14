@@ -11,22 +11,43 @@ def get_text():
 
 @st.cache
 def unmask(text):
-    split_text = text.split("*?")
-    result_text = split_text[0]
+    Substring = '[*][?]'
     results = [""]
-    unmasker = pipeline('fill-mask', model='camembert-base')
-    
-    for i in range(1, len(split_text)):
-        tmp_result = unmasker(result_text + "<mask>" + split_text[i])
 
-        result_text += tmp_result[0]["token_str"] + split_text[i]
+    menu = re.search(Substring, text)
+    if menu:
+        result_text = text[:menu.span()[0]]
+        index = menu.span()[1]
+        menu = re.search(Substring, text[index:])
+    else:
+        results[0] = text
+        return results
+
+    unmasker = pipeline('fill-mask', model='camembert-base')
+
+    while menu:
+        tmp_result = unmasker(result_text + "<mask>" + text[index: index + menu.span()[0]])
+        result_text += tmp_result[0]["token_str"] + text[index: index + menu.span()[0]]
 
         results.append("")
+        len_list = len(results)-1
         for el in tmp_result:
-            results[i] += (el["token_str"] + " - " + str(round(el["score"] * 100)) + "%  |  ")
+            results[len_list] += (el["token_str"] + " - " + str(round(el["score"] * 100)) + "%  |  ")
 
-    results[0]=result_text
-    return results
+        index += menu.span()[1]
+
+        menu = re.search(Substring, text[index:])
+    else:
+        tmp_result = unmasker(result_text + "<mask>" + text[index:])
+        result_text += tmp_result[0]["token_str"] + text[index:]
+
+        results.append("")
+        len_list = len(results)-1
+        for el in tmp_result:
+            results[len_list] += (el["token_str"] + " - " + str(round(el["score"] * 100)) + "%  |  ")
+
+        results[0] = result_text
+        return results
 
 
 def main():
